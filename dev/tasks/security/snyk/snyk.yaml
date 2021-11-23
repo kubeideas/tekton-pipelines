@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: snyk
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.28.0"
+    tekton.dev/categories: Security Tools
+    tekton.dev/tags: security-tool
+    tekton.dev/displayName: "Image vulnerability scan"    
+spec:
+  description: |
+    This task scan docker image for vulnerabilities
+  params:
+    - name: image_repo
+      description: Repository to retrieve image for deployment
+    - name: image_tag
+      description: Image tag for deployment  
+    - name: snyk_secret
+      description: Snyk token secret.    
+  steps:
+  - name: scan
+    image: kubeideas/snyk:v0.1.0
+    workingDir: $(workspaces.source.path)
+    args:
+      - container
+      #- --exclude-base-image-vulns
+      #- --severity-threshold=low|medium|high|critical
+      - test
+      - "$(params.image_repo):$(params.image_tag)"
+      - -file=Dockerfile
+    envFrom:
+      - secretRef:
+          name: $(params.snyk_secret)
+    
+  workspaces:
+    - name: source
+      description: Source code workspace

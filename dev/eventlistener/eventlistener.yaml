@@ -1,0 +1,62 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: event-listener
+spec:
+  serviceAccountName: tekton-triggers
+  resources:
+    kubernetesResource:
+      spec:
+        template:
+          spec:
+            containers:
+            - resources:
+                limits:
+                  memory: "100Mi"
+                  cpu: "200m"  
+                requests:
+                  memory: "20Mi"
+                  cpu: "10m"
+  triggers:
+    - name: books-trigger
+      interceptors:
+        - name: "Validate GitHub payload and filter on eventType"
+          ref:
+            name: "github"
+            kind: ClusterInterceptor
+            apiVersion: triggers.tekton.dev
+          params:
+          - name: "secretRef"
+            value:
+              secretName: github-token
+              secretKey: secretToken
+          - name: "eventTypes"
+            value: ["push"]
+        - name: "Filter repository"    
+          ref:
+            name: cel
+          params:
+          - name: "filter"     
+            value: "body.repository.full_name == 'antonio-tolentino/books'" 
+        - name: "Filter branch"    
+          ref:
+            name: cel
+          params:
+          - name: "filter"
+            value: "body.ref.split('/')[2] == 'develop'" 
+        - name: "overlays"    
+          ref:
+            name: cel
+          params:
+          - name: "overlays"
+            value:
+            - key: short_sha
+              expression: "body.after.truncate(7)"
+            - key: branch_name
+              expression: "body.ref.split('/')[2]"
+      bindings:
+      - ref: books-trigger-binding
+      template:
+        ref: books-trigger-template
+
+  

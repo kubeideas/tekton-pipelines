@@ -1,0 +1,67 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: helm
+  labels:
+    app.kubernetes.io/version: "0.3"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.28.0"
+    tekton.dev/categories: Deploy Tools
+    tekton.dev/tags: deploy-tool
+    tekton.dev/displayName: "Deploy application using helm charts"    
+spec:
+  description: |
+    This task install and configure application using helm chart
+  params:
+    - name: chart_repo_url
+      description: URL for helm charts repository  
+    - name: chart_name
+      description: Helm chart name
+    - name: chart_version
+      description: Helm chart version      
+    - name: release
+      description: Helm release name
+    - name: description
+      description: Helm installation description      
+    - name: history_max
+      description: Helm max history 
+      default: "10"    
+    - name: namespace
+      description: Namespace to deploy application
+    - name: helm_custom_file
+      description: Helm custom config file
+      default: ""
+    - name: image_repo
+      description: Repository to retrieve image for deployment
+    - name: image_tag
+      description: Image tag for deployment
+
+  steps:
+  - name: apply-helm-charts
+    image: kubeideas/helm:v3.7.1
+    workingDir: $(workspaces.source.path)
+    env:
+      - name: "CHART_REPO_URL"
+        value: $(params.chart_repo_url)    
+      - name: "CHART_NAME"
+        value: $(params.chart_name)      
+      - name: "CHART_VERSION"
+        value: $(params.chart_version)    
+      - name: "RELEASE"
+        value: $(params.release)     
+      - name: "DESCRIPTION"
+        value: $(params.description)      
+      - name: "HISTORY_MAX"
+        value: $(params.history_max)   
+      - name: "NAMESPACE"
+        value: $(params.namespace)    
+      - name: "HELM_CUSTOM_FILE"
+        value: $(params.helm_custom_file)     
+      - name: "IMAGE_REPO"
+        value: $(params.image_repo)     
+      - name: "IMAGE_TAG"
+        value: $(params.image_tag)                                               
+ 
+  workspaces:
+    - name: source
+      description: Source code workspace where Helm custom file can be found
