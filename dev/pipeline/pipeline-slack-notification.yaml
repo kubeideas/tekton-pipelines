@@ -21,8 +21,8 @@ spec:
     description: Helm chart name.
   - name: chart_version
     description: Helm chart version.
-  - name: release
-    description: Helm release name.
+  - name: release_deploy
+    description: Helm release name for deploy.
   - name: description
     description: Helm installation description.
   - name: namespace
@@ -30,7 +30,7 @@ spec:
   - name: helm_custom_file
     description: Helm custom config file.
   - name: image_repo
-    description: "Image repository (Ex: gcr.io/project123/myimage)."
+    description: "Image repository (Ex: docker.io/myorganization/myimage)"
   - name: image_tag
     description: Image tag.
   - name: enable_notifications
@@ -133,7 +133,7 @@ spec:
     - name: chart_version
       value: $(params.chart_version)
     - name: release
-      value: $(params.release)
+      value: $(params.release_deploy)
     - name: description
       value: $(params.description)
     - name: history_max
