@@ -8,26 +8,10 @@ spec:
     description: git repository URL.
   - name: git_commit
     description: Git commit.
-  - name: chart_repo_url
-    description: URL for helm charts repository.
-  - name: chart_name
-    description: Helm chart name.
-  - name: chart_version
-    description: Helm chart version.
-  - name: release      
-    description: Helm release name.
   - name: description
     description: Helm installation description.
-  - name: namespace
-    description: Namespace to deploy application.
-  - name: helm_custom_file
-    description: Helm custom config file.
-  - name: image_repo
-    description: "Image repository (Ex: gcr.io/project123/myimage)."
   - name: image_tag
     description: Image tag   
-  - name: enable_notifications
-    description: Slack notifications should be enabled? ("true"|"false").
   - name: git_repo
     description: Git repository full name.
   - name: git_branch
@@ -36,8 +20,6 @@ spec:
     description: Git pusher name. 
   - name: pusher_email
     description: Git pusher email.
-  - name: recipients
-    description: Recipient email address list separated by space or a group.
 
 
   resourcetemplates:
@@ -55,25 +37,25 @@ spec:
       - name: git_commit
         value: $(tt.params.git_commit)        
       - name: chart_repo_url
-        value: $(tt.params.chart_repo_url)
+        value: https://antonio-tolentino.github.io/charts/
       - name: chart_name
-        value: $(tt.params.chart_name)      
+        value: generic
       - name: chart_version
-        value: $(tt.params.chart_version)     
-      - name: release
-        value: $(tt.params.release) 
+        value: "1.1.0"   
+      - name: release_deploy
+        value: books
       - name: description
-        value: $(tt.params.description)         
+        value: $(tt.params.description)      
       - name: namespace
-        value: $(tt.params.namespace) 
+        value: tekton-tests
       - name: helm_custom_file
-        value: $(tt.params.helm_custom_file)    
+        value: helm.yaml
       - name: image_repo
-        value: $(tt.params.image_repo)
+        value: tolentino/books
       - name: image_tag 
         value: $(tt.params.image_tag)    
       - name: enable_notifications
-        value: $(tt.params.enable_notifications) 
+        value: "true"
       - name: git_repo
         value: $(tt.params.git_repo)
       - name: git_branch
@@ -83,8 +65,7 @@ spec:
       - name: pusher_email
         value: $(tt.params.pusher_email)
       - name: recipients
-        value: $(tt.params.recipients)  
-
+        value: atcjunior@gmail.com
 
       workspaces:
       - name: github-ssh
@@ -93,7 +74,6 @@ spec:
       - name: code-ws
         persistentVolumeClaim:
           claimName: books-pipeline
-      
       
 
 ---
@@ -107,28 +87,10 @@ spec:
     value: $(body.repository.ssh_url)
   - name: git_commit
     value: $(body.after)
-  - name: chart_repo_url
-    value: https://antonio-tolentino.github.io/charts/
-  - name: chart_name
-    value: generic
-  - name: chart_version
-    value: "1.1.0"   
-  - name: release
-    value: books
   - name: description
     value: "commit $(body.after)"
-  - name: namespace
-    value: tekton-tests
-  - name: helm_custom_file
-    value: helm.yaml
-  - name: image_repo
-    value: tolentino/books
   - name: image_tag 
     value: $(extensions.short_sha)
-  - name: enable_notifications
-    value: "true"
-  - name: channel
-    value: tekton-pipelines
   - name: git_repo
     value: $(body.repository.full_name)
   - name: git_branch
@@ -137,5 +99,3 @@ spec:
     value: $(body.pusher.name)
   - name: pusher_email
     value: $(body.pusher.email)
-  - name: recipients
-    value: atcjunior@gmail.com
