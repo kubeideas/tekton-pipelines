@@ -47,7 +47,7 @@ spec:
       - name: namespace
         value: tekton-tests
       - name: helm_custom_file
-        value: helm.yaml
+        value: helm_custom.yaml
       - name: image_repo
         value: tolentino/books
       - name: image_tag 
