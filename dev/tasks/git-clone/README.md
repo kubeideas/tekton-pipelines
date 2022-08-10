@@ -1,8 +1,8 @@
-# Github ssh keys
+# GitHub ssh keys
 
-## Genereate new ssh private and public keys and create Kubernetes secret.
+## Genereate new ssh private and public keys and create Kubernetes secret
 
-Secret created by this script will be used in eventlistener to validate Github webhooks.
+Secret created by this script will be used in eventlistener to validate GitHub webhooks.
 
 ``` bash
 ./github-ssh-secret.sh
@@ -13,12 +13,13 @@ Secret created by this script will be used in eventlistener to validate Github w
 Installing git-clone task from Tekton Hub
 
 ``` bash
-kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.5/git-clone.yaml
+kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.7/git-clone.yaml
+
 ```
 
-## Import Public to github service user
+## Import Public to GitHub service user
 
-Create a github account with permissions to clone project repository code and import public key generated previously.
+Create a GitHub account with permissions to clone project repository code and import public key generated previously.
 
 ## Safe place for ssh keys
 
