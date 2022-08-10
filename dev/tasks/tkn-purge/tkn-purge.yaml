@@ -21,7 +21,7 @@ spec:
   steps:
   - name: remove-old-pipelinerun
     onError: continue
-    image: kubeideas/tkncli:v0.21.0
+    image: docker.io/kubeideas/tkncli:v0.23.1
     script: |
       #!/usr/bin/env sh  
 
