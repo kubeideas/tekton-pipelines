@@ -29,8 +29,8 @@ spec:
     type: array
     default: []
   - name: version
-    description: Kaniko image version (default is v1.6.0)
-    default: v1.6.0
+    description: Kaniko image version (default is v1.8.1)
+    default: v1.8.1
   - name: verbosity
     description: Kaniko log level (<panic|fatal|error|warn|info|debug|trace>) (default is info)
     default: info

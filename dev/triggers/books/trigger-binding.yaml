@@ -1,0 +1,22 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: books-trigger-binding
+spec:
+  params:
+  - name: git_url
+    value: $(body.repository.ssh_url)
+  - name: git_commit
+    value: $(body.after)
+  - name: description
+    value: "commit $(body.after)"
+  - name: image_tag 
+    value: $(extensions.short_sha)
+  - name: git_repo
+    value: $(body.repository.full_name)
+  - name: git_branch
+    value: $(extensions.branch_name)
+  - name: pusher_name
+    value: $(body.pusher.name)
+  - name: pusher_email
+    value: $(body.pusher.email)

@@ -1,4 +1,4 @@
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: books-trigger-template
@@ -20,8 +20,6 @@ spec:
     description: Git pusher name. 
   - name: pusher_email
     description: Git pusher email.
-
-
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -49,7 +47,7 @@ spec:
       - name: namespace
         value: tekton-tests
       - name: helm_custom_file
-        value: helm.yaml
+        value: helm_custom.yaml
       - name: image_repo
         value: tolentino/books
       - name: image_tag 
@@ -66,7 +64,6 @@ spec:
         value: $(tt.params.pusher_email)
       - name: recipients
         value: atcjunior@gmail.com
-
       workspaces:
       - name: github-ssh
         secret:
@@ -74,28 +71,3 @@ spec:
       - name: code-ws
         persistentVolumeClaim:
           claimName: books-pipeline
-      
-
----
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: TriggerBinding
-metadata:
-  name: books-trigger-binding
-spec:
-  params:
-  - name: git_url
-    value: $(body.repository.ssh_url)
-  - name: git_commit
-    value: $(body.after)
-  - name: description
-    value: "commit $(body.after)"
-  - name: image_tag 
-    value: $(extensions.short_sha)
-  - name: git_repo
-    value: $(body.repository.full_name)
-  - name: git_branch
-    value: $(extensions.branch_name)
-  - name: pusher_name
-    value: $(body.pusher.name)
-  - name: pusher_email
-    value: $(body.pusher.email)
