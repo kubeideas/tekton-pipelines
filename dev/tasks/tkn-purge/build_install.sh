@@ -29,7 +29,7 @@ check_cmd_exit() {
     echo ""
     
     ## clear tmp dir
-    clear_tmp
+    #clear_tmp
 
     exit 1
   fi
@@ -44,7 +44,7 @@ build_image () {
   check_cmd_exit $?
 
   docker scan ${IMG}
-  check_cmd_exit $?  
+  #check_cmd_exit $?  
 
   docker push ${IMG}
   check_cmd_exit $?
