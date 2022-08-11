@@ -29,13 +29,19 @@ spec:
       type: array
       default: []
     - name: version
-      description: Kaniko image version (default is v1.8.1)
+      description: Kaniko image version (default is v1.8.1).
       default: v1.8.1
     - name: verbosity
-      description: Kaniko log level (<panic|fatal|error|warn|info|debug|trace>) (default is info)
+      description: Kaniko log level (<panic|fatal|error|warn|info|debug|trace>) (default is info).
       default: info
     - name: dockerconfig_secret
-      description: Docker hub credentials secret
+      description: Docker hub credentials secret.
+
+  results:
+    - name: IMAGE_DIGEST
+      description: Image digest.
+    - name: IMAGE_URL
+      description: Image Url.
 
   workspaces:
   - name: source
@@ -53,6 +59,7 @@ spec:
     - --oci-layout-path=$(workspaces.source.path)/$(params.context)/image-digest 
     - --cache-dir=/cache
     - --verbosity=$(params.verbosity)
+    - --digest-file=$(results.IMAGE_DIGEST.path)
     - $(params.extra_args[*])
     securityContext:
       runAsUser: 0
@@ -65,6 +72,12 @@ spec:
       #- name: m2-cache
       #  mountPath: /root/.m2
 
+  - name: emmit-result-image-url
+    image: bash:latest
+    script: |
+      #!/usr/bin/env bash
+      echo -n "$(params.image_repo):$(params.image_tag)"|tee $(results.IMAGE_URL.path)
+      
   volumes:
   - name: dockerconfig-secret
     secret: 

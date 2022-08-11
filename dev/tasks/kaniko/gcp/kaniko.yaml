@@ -37,6 +37,11 @@ spec:
   - name: gcp_service_account_secret
     description: GCP service account secret
    
+  results:
+    - name: IMAGE_DIGEST
+      description: Image digest.
+    - name: IMAGE_URL
+      description: Image Url.
 
   workspaces:
   - name: source
@@ -57,6 +62,7 @@ spec:
     - --oci-layout-path=$(workspaces.source.path)/$(params.context)/image-digest 
     - --cache-dir=/cache
     - --verbosity=$(params.verbosity)
+    - --digest-file=$(results.IMAGE_DIGEST.path)    
     - $(params.extra_args[*])
     securityContext:
       runAsUser: 0
@@ -68,6 +74,12 @@ spec:
       # Java Maven m2 cache
       #- name: m2-cache
       #  mountPath: /root/.m2
+
+  - name: emmit-result-image-url
+    image: bash:latest
+    script: |
+      #!/usr/bin/env bash
+      echo -n "$(params.image_repo):$(params.image_tag)"|tee $(results.IMAGE_URL.path)
 
   volumes:
   - name: gcp-service-account-secret
