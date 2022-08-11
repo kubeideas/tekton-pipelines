@@ -15,7 +15,6 @@ rules:
   - triggerbindings
   - triggertemplates
   - triggers
-  - pipelineresources
   verbs: 
   - get
   - list

@@ -31,7 +31,6 @@ rules:
   - tekton.dev
   resources: 
   - pipelineruns
-  - pipelineresources
   - taskruns
   verbs: 
   - create
