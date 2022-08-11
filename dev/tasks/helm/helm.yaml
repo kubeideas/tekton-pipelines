@@ -32,9 +32,16 @@ spec:
       description: Helm custom config file
       default: ""
     - name: image_repo
-      description: Repository to retrieve image for deployment
+      description: Repository for image pull.
     - name: image_tag
-      description: Image tag for deployment
+      description: Image tag.
+  results:
+    - name: IMAGE_URL
+      description: Image Url.
+
+  workspaces:
+    - name: source
+      description: Source code workspace where Helm custom file can be found
 
   steps:
   - name: apply-helm-charts
@@ -62,6 +69,9 @@ spec:
       - name: "IMAGE_TAG"
         value: $(params.image_tag)                                               
  
-  workspaces:
-    - name: source
-      description: Source code workspace where Helm custom file can be found
+  - name: emmit-result-image-url
+    image: bash:latest
+    script: |
+      #!/usr/bin/env bash
+      echo -n "$(params.image_repo):$(params.image_tag)"|tee $(results.IMAGE_URL.path)
+
