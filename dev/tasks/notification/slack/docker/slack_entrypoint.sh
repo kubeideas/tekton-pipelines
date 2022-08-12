@@ -36,8 +36,8 @@ check_env () {
 replace_msg_template () {
 
   ## check env 
-  env_var_list=("CHANNEL" "GIT_REPO" "GIT_BRANCH" "GIT_COMMIT" "PUSHER_NAME" 
-                "PUSHER_EMAIL" "PIPELINERUN_NAME" "NAMESPACE" "PIPELINERUN_STATUS")
+  env_var_list=("GIT_REPO" "GIT_BRANCH" "GIT_COMMIT" "PUSHER_NAME" 
+                "PUSHER_EMAIL" "PIPELINERUN_NAME" "NAMESPACE" "PIPELINERUN_STATUS" "CHANNEL")
   check_env ${env_var_list}
 
   ## Check pipeline status

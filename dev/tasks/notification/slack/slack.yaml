@@ -13,8 +13,6 @@ spec:
   description: |
     This task send messages to slack channel
   params:
-    - name: channel
-      description: Slack Channel.
     - name: git_repo
       description: Git repository full name.
     - name: git_commit
@@ -31,6 +29,8 @@ spec:
       description: PipelineRun name.
     - name: namespace
       description: Application namespace.
+    - name: channel
+      description: Slack Channel.
     - name: slack_secret
       description: Slack token secret.
 
@@ -54,6 +54,8 @@ spec:
         value: $(params.pipelinerun_name)
       - name: "NAMESPACE"
         value: $(params.namespace)
+      - name: "CHANNEL"
+        value: $(params.channel)        
     envFrom:
       - secretRef:
           name: $(params.slack_secret)   

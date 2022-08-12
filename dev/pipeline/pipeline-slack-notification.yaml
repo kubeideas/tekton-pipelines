@@ -164,8 +164,6 @@ spec:
   finally:
     - name: notify-success
       params:
-        - name: channel
-          value: $(params.channel)
         - name: git_repo
           value: $(params.git_repo)
         - name: git_commit
@@ -182,6 +180,8 @@ spec:
           value: $(context.pipelineRun.name)  
         - name: namespace
           value: $(params.namespace)
+        - name: channel
+          value: $(params.channel)          
         - name: slack_secret
           value: slack
       when:
@@ -196,8 +196,6 @@ spec:
 
     - name: notify-failure
       params:
-        - name: channel
-          value: $(params.channel)
         - name: git_repo
           value: $(params.git_repo)
         - name: git_commit
@@ -214,6 +212,8 @@ spec:
           value: $(context.pipelineRun.name)
         - name: namespace
           value: $(params.namespace)
+        - name: channel
+          value: $(params.channel)          
         - name: slack_secret
           value: slack          
       when:
