@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ## variables
-DAT=$(date)
-FILE_TEMPLATE=""
+CUR_DAT=$(date)
+FILE_TEMPLATE="email_template.html"
 
 ## Check commands return code
 check_cmd_exit() {
@@ -43,9 +43,11 @@ replace_msg_template () {
 
   ## Check pipeline status
   if [ ${PIPELINERUN_STATUS} == "Completed" ] || [ ${PIPELINERUN_STATUS} == "Succeeded" ]; then
-    FILE_TEMPLATE="success_template.html"
+    HEADER_CLASS="successful-header"
+    HEADER_MSG="Success!"
   else
-    FILE_TEMPLATE="failure_template.html"
+    HEADER_CLASS="failed-header"
+    HEADER_MSG="Failure!"
   fi
   
   sed -i "s|{GIT_REPO}|${GIT_REPO}|g" ./${FILE_TEMPLATE}
@@ -56,7 +58,9 @@ replace_msg_template () {
   sed -i "s|{PIPELINERUN_NAME}|${PIPELINERUN_NAME}|g" ./${FILE_TEMPLATE}
   sed -i "s|{NAMESPACE}|${NAMESPACE}|g" ./${FILE_TEMPLATE}
   sed -i "s|{PIPELINERUN_STATUS}|${PIPELINERUN_STATUS}|g" ./${FILE_TEMPLATE}
-  sed -i "s|{DAT}|${DAT}|g" ./${FILE_TEMPLATE}
+  sed -i "s|{HEADER_CLASS}|${HEADER_CLASS}|g" ./${FILE_TEMPLATE}
+  sed -i "s|{HEADER_MSG}|${HEADER_MSG}|g" ./${FILE_TEMPLATE}
+  sed -i "s|{CUR_DAT}|${CUR_DAT}|g" ./${FILE_TEMPLATE}
 
 }
 

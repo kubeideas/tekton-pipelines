@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: sendmail
   labels:
-    app.kubernetes.io/version: "0.1"
+    app.kubernetes.io/version: "0.3"
   annotations:
     tekton.dev/pipelines.minVersion: "0.28.0"
     tekton.dev/categories: Notification Tools
@@ -43,7 +43,7 @@ spec:
 
   steps:
   - name: send-message
-    image: kubeideas/sendmail:v0.1.0
+    image: docker.io/kubeideas/sendmail:v0.3.0
     env:
       - name: "GIT_REPO"
         value: $(params.git_repo)
