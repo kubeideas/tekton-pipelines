@@ -1,0 +1,57 @@
+{
+    "channel": "<CHANNEL>",
+    "attachments": [
+        {
+	        "mrkdwn_in": ["text"],
+            "color": "{COLOR}",
+            "title": "Tekton Pipelines",
+            "fields": [
+                {
+                    "title": "Repo",
+                    "value": "{GIT_REPO}",
+                    "short": true
+                },
+                {
+                    "title": "Branch",
+                    "value": "{GIT_BRANCH}",
+                    "short": true
+                },     
+                {
+                    "title": "Commit",
+                    "value": "{GIT_COMMIT}",
+                    "short": false
+                },                          
+                {
+                    "title": "Pusher",
+                    "value": "{PUSHER_NAME}",
+                    "short": true
+                },
+                {
+                    "title": "Email",
+                    "value": "{PUSHER_NAME}",
+                    "short": true
+                },   
+                {
+                    "title": "Pipelinerun",
+                    "value": "{PIPELINERUN_NAME}",
+                    "short": true
+                },   
+                {
+                    "title": "Namespace",
+                    "value": "{NAMESPACE}",
+                    "short": true
+                },                 
+                {
+                    "title": "Status",
+                    "value": "{PIPELINERUN_STATUS}",
+                    "short": true
+                },   
+                {
+                    "title": "When",
+                    "value": "{CUR_DAT}",
+                    "short": true
+                }                                                            
+            ]
+        }
+    ]
+}

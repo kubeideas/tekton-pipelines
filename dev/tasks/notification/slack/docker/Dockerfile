@@ -3,7 +3,7 @@ FROM  fedora:34
 
 LABEL maintainer="Antonio Tolentino - atcjunior@gmail.com"
 
-ADD --chown=65532:65532 *_template.json /slack/
+ADD --chown=65532:65532 slack_template.json /slack/
 ADD --chown=65532:65532 slack_entrypoint.sh /slack/
 
 RUN groupadd -g 65532 slack && \

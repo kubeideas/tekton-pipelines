@@ -2,8 +2,8 @@
 
 
 # Variables
-FILE_TEMPLATE=""
-DAT=$(date)
+FILE_TEMPLATE="slack_template.json"
+CUR_DAT=$(date)
 
 ## Check commands return code
 check_cmd_exit() {
@@ -37,42 +37,41 @@ replace_msg_template () {
 
   ## check env 
   env_var_list=("GIT_REPO" "GIT_BRANCH" "GIT_COMMIT" "PUSHER_NAME" 
-                "PUSHER_EMAIL" "PIPELINERUN_NAME" "NAMESPACE" "PIPELINERUN_STATUS" "CHANNEL")
+                "PUSHER_EMAIL" "PIPELINERUN_NAME" "NAMESPACE" "PIPELINERUN_STATUS" )
   check_env ${env_var_list}
 
   ## Check pipeline status
   if [ ${PIPELINERUN_STATUS} == "Completed" ] || [ ${PIPELINERUN_STATUS} == "Succeeded" ]; then
-    FILE_TEMPLATE="success_template.json"
+    COLOR="good"
   else
-    FILE_TEMPLATE="failure_template.json"
+    COLOR="danger"
   fi
   
-  sed -i "s|<CHANNEL>|${CHANNEL}|g" ${FILE_TEMPLATE}
-  sed -i "s|<GIT_REPO>|${GIT_REPO}|g" ${FILE_TEMPLATE}
-  sed -i "s|<GIT_BRANCH>|${GIT_BRANCH}|g" ${FILE_TEMPLATE}
-  sed -i "s|<GIT_COMMIT>|${GIT_COMMIT}|g" ${FILE_TEMPLATE}
-  sed -i "s|<PUSHER_NAME>|${PUSHER_NAME}|g" ${FILE_TEMPLATE}
-  sed -i "s|<PUSHER_EMAIL>|${PUSHER_EMAIL}|g" ${FILE_TEMPLATE}
-  sed -i "s|<PIPELINERUN_NAME>|${PIPELINERUN_NAME}|g" ${FILE_TEMPLATE}
-  sed -i "s|<PIPELINERUN_STATUS>|${PIPELINERUN_STATUS}|g" ${FILE_TEMPLATE}
-  sed -i "s|<NAMESPACE>|${NAMESPACE}|g" ${FILE_TEMPLATE}
-  sed -i "s|<DAT>|${DAT}|g" ${FILE_TEMPLATE}
+  sed -i "s|{GIT_REPO}|${GIT_REPO}|g" ${FILE_TEMPLATE}
+  sed -i "s|{GIT_BRANCH}|${GIT_BRANCH}|g" ${FILE_TEMPLATE}
+  sed -i "s|{GIT_COMMIT}|${GIT_COMMIT}|g" ${FILE_TEMPLATE}
+  sed -i "s|{PUSHER_NAME}|${PUSHER_NAME}|g" ${FILE_TEMPLATE}
+  sed -i "s|{PUSHER_EMAIL}|${PUSHER_EMAIL}|g" ${FILE_TEMPLATE}
+  sed -i "s|{PIPELINERUN_NAME}|${PIPELINERUN_NAME}|g" ${FILE_TEMPLATE}
+  sed -i "s|{PIPELINERUN_STATUS}|${PIPELINERUN_STATUS}|g" ${FILE_TEMPLATE}
+  sed -i "s|{NAMESPACE}|${NAMESPACE}|g" ${FILE_TEMPLATE}
+  sed -i "s|{COLOR}|${COLOR}|g" ${FILE_TEMPLATE}
+  sed -i "s|{CUR_DAT}|${CUR_DAT}|g" ${FILE_TEMPLATE}
   
 }
 
 send_msg () {
   
   ## check required env
-  check_env "TOKEN"
+  check_env "HOOK_URL"
 
   echo ""
   echo " Sending Slack message..."
   echo ""
 
-  curl -s -H "Content-type: application/json; charset=utf-8" \
-        --data "@${FILE_TEMPLATE}" \
-        -H "Authorization: Bearer ${TOKEN}" \
-        -X POST https://slack.com/api/chat.postMessage
+  curl -s -X POST -H 'Content-type: application/json' \
+       --data "@${FILE_TEMPLATE}" \
+       ${HOOK_URL}        
   
   check_cmd_exit $?
 }

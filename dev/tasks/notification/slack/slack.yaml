@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: slack
   labels:
-    app.kubernetes.io/version: "0.2"
+    app.kubernetes.io/version: "0.4"
   annotations:
     tekton.dev/pipelines.minVersion: "0.28.0"
     tekton.dev/categories: Notification Tools
@@ -29,14 +29,12 @@ spec:
       description: PipelineRun name.
     - name: namespace
       description: Application namespace.
-    - name: channel
-      description: Slack Channel.
     - name: slack_secret
       description: Slack token secret.
 
   steps:
   - name: send-message
-    image: kubeideas/slack:v0.1.0
+    image: docker.io/kubeideas/slack:v0.4.0
     env:
       - name: "GIT_REPO"
         value: $(params.git_repo)
@@ -54,8 +52,6 @@ spec:
         value: $(params.pipelinerun_name)
       - name: "NAMESPACE"
         value: $(params.namespace)
-      - name: "CHANNEL"
-        value: $(params.channel)        
     envFrom:
       - secretRef:
           name: $(params.slack_secret)   
