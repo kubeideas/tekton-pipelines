@@ -8,6 +8,8 @@ spec:
     description: git repository URL.
   - name: git_commit
     description: Git commit.
+  - name: golang_version
+    description: Golang version    
   - name: description
     description: Helm installation description.
   - name: image_tag
@@ -34,6 +36,8 @@ spec:
         value: $(tt.params.git_url)
       - name: git_commit
         value: $(tt.params.git_commit)
+      - name: golang_version
+        value: "1.16"
       - name: chart_repo_url
         value: https://antonio-tolentino.github.io/charts/
       - name: chart_name

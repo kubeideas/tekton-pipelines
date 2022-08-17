@@ -15,6 +15,8 @@ spec:
     description: git repository URL.
   - name: git_commit
     description: Git commit.
+  - name: golang_version
+    description: Golang version
   - name: chart_repo_url
     description: URL for helm charts repository.
   - name: chart_name
@@ -79,7 +81,7 @@ spec:
       name: golang-code-coverage
     params:
     - name: version
-      value: "1.15" 
+      value: "$(params.golang_version)"
     workspaces:
     - name: golang-source
       workspace: code-ws
