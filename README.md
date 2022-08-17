@@ -1,3 +1,3 @@
 # Tekton
 
-Tekton pipelines
+Tekton pipeline example.
