@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: tkn-purge
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.28.0"
+    tekton.dev/categories: Tekton client
+    tekton.dev/tags: purge-tool
+    tekton.dev/displayName: "Purge old pipelineruns"    
+spec:
+  description: >-
+    This task removes old pipelineruns
+  params:
+    - name: keep
+      description: Keep last N executions
+      default: "5"
+    - name: pipeline
+      description: Pipeline name
+  steps:
+  - name: remove-old-pipelinerun
+    onError: continue
+    image: docker.io/kubeideas/tkncli:v0.23.1
+    script: |
+      #!/usr/bin/env sh  
+
+      RESULT=$(/tkn pr delete --ignore-running --force --keep=$(params.keep) --pipeline=$(params.pipeline))
+
+      echo $RESULT
+
+      ## If there are nothing to be removed due to keep value, command returns exit 1. Possible tekton client bug.
+      MSG_ERROR="Error: no PipelineRuns associated with Pipeline"
+      if [[ "$RESULT" =~ "$MSG_ERROR" ]]; 
+        then
+         echo "Nothing to be deleted."
+         exit 0
+      fi

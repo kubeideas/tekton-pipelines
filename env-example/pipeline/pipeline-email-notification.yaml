@@ -1,0 +1,243 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: golang-pipeline
+spec:
+  description: |
+    This pipeline does:
+      - clone code from git
+      - check code for forgotten secrets
+      - build container image and push to registry
+      - Deploy application with generic helm chart
+      - notify success or failure
+  params:
+  - name: git_url
+    description: git repository URL.
+  - name: git_commit
+    description: Git commit.
+  - name: golang_version
+    description: Golang version    
+  - name: chart_repo_url
+    description: URL for helm charts repository.
+  - name: chart_name
+    description: Helm chart name.
+  - name: chart_version
+    description: Helm chart version.
+  - name: release_deploy      
+    description: Helm release name for deploy.
+  - name: description
+    description: Helm installation description.
+  - name: namespace
+    description: Namespace to deploy application.
+  - name: helm_custom_file
+    description: Helm custom config file.
+  - name: image_repo
+    description: "Image repository (Ex: docker.io/myorganization/myimage)"
+  - name: image_tag
+    description: Image tag
+  - name: enable_notifications
+    description: Slack notifications should be enabled? ("true"|"false").
+  - name: git_repo
+    description: Git repository full name.
+  - name: git_branch
+    description: Git branch.
+  - name: pusher_name
+    description: Git pusher name. 
+  - name: pusher_email
+    description: Git pusher email.
+  - name: recipients
+    description: Recipient email address list separated by space or a group.
+
+  tasks:
+  - name: fetch-git-repo
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: $(params.git_url)
+    - name: revision
+      value: $(params.git_commit)
+    - name: deleteExisting
+      value: "true"  
+    - name: gitInitImage
+      value: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.29.0"
+    workspaces:
+    - name: ssh-directory
+      workspace: github-ssh
+    - name: output
+      workspace: code-ws
+
+  - name: secrets-scan
+    runAfter:
+     - fetch-git-repo
+    taskRef:
+      name: gitleaks
+    workspaces:
+    - name: source
+      workspace: code-ws
+
+  - name: golang-code-coverage
+    runAfter:
+     - secrets-scan
+    taskRef:
+      name: golang-code-coverage
+    params:
+    - name: version
+      value: "$(params.golang_version)"
+    workspaces:
+    - name: golang-source
+      workspace: code-ws
+
+  - name: build-image
+    runAfter:
+     - golang-code-coverage
+    taskRef:
+      name: kaniko
+    params:
+    - name: image_repo
+      value: $(params.image_repo)
+    - name: image_tag
+      value: $(params.image_tag)
+    - name: dockerconfig_secret
+      value: dockerconfig
+    workspaces:
+    - name: source
+      workspace: code-ws
+
+
+  - name: image-scan
+    runAfter:
+     - build-image
+    taskRef:
+      name: snyk
+    params:
+    - name: image_repo
+      value: $(params.image_repo)
+    - name: image_tag
+      value: $(params.image_tag)
+    - name: snyk_secret
+      value: snyk
+    workspaces:
+    - name: source
+      workspace: code-ws
+
+  - name: helm-deploy
+    runAfter:
+     - image-scan
+    taskRef:
+      name: helm
+    params:
+    - name: chart_repo_url
+      value: $(params.chart_repo_url)
+    - name: chart_name
+      value: $(params.chart_name)
+    - name: chart_version
+      value: $(params.chart_version)
+    - name: release
+      value: $(params.release_deploy)
+    - name: description
+      value: $(params.description)
+    - name: history_max
+      value: "5"
+    - name: namespace
+      value: $(params.namespace)
+    - name: helm_custom_file
+      value: $(params.helm_custom_file)
+    - name: image_repo
+      value:  $(params.image_repo)
+    - name: image_tag
+      value:  $(params.image_tag)
+    workspaces:
+    - name: source
+      workspace: code-ws  
+
+  - name: purge-old-pr
+    runAfter:
+     - helm-deploy
+    taskRef:
+      name: tkn-purge
+    params:
+    - name: keep
+      value: "3"
+    - name: pipeline
+      value: $(context.pipeline.name)
+
+  finally:
+    - name: notify-success
+      params:
+        - name: git_repo
+          value: $(params.git_repo)
+        - name: git_commit
+          value: $(params.git_commit)
+        - name: git_branch
+          value: $(params.git_branch)  
+        - name: pusher_name
+          value: $(params.pusher_name)
+        - name: pusher_email
+          value: $(params.pusher_email)
+        - name: pipelinerun_status
+          value: $(tasks.status)
+        - name: pipelinerun_name
+          value: $(context.pipelineRun.name) 
+        - name: namespace
+          value: $(params.namespace)
+        - name: sendmail_secret
+          value: sendmail
+        - name: from
+          value: "tekton@dev.test"
+        - name: recipients
+          value: $(params.recipients)
+        - name: subject
+          value: "Tekton Pipelines DEV"
+      when:
+        - input: "$(tasks.status)"
+          operator: in
+          values: ["Completed","Succeeded"]
+        - input: $(params.enable_notifications)
+          operator: in
+          values: ["true"]
+      taskRef:
+        name: sendmail   
+
+    - name: notify-failure
+      params:
+        - name: git_repo
+          value: $(params.git_repo)
+        - name: git_commit
+          value: $(params.git_commit)
+        - name: git_branch
+          value: $(params.git_branch)  
+        - name: pusher_name
+          value: $(params.pusher_name)
+        - name: pusher_email
+          value: $(params.pusher_email)
+        - name: pipelinerun_status
+          value: $(tasks.status)
+        - name: pipelinerun_name
+          value: $(context.pipelineRun.name) 
+        - name: namespace
+          value: $(params.namespace)
+        - name: sendmail_secret
+          value: sendmail
+        - name: from
+          value: "tekton@dev.test"
+        - name: recipients
+          value: $(params.recipients)
+        - name: subject
+          value: "Tekton Pipelines DEV"
+      when:
+        - input: "$(tasks.status)"
+          operator: in
+          values: ["Failed"]
+        - input: $(params.enable_notifications)
+          operator: in
+          values: ["true"]
+      taskRef:
+        name: sendmail
+
+
+  workspaces:
+  - name: github-ssh
+  - name: code-ws
+
+  

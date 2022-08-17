@@ -1,0 +1,91 @@
+ 
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kaniko
+  namespace: develop
+  labels:
+    app.kubernetes.io/version: "0.3"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.28.0"
+    tekton.dev/categories: Image Build
+    tekton.dev/tags: image-build
+    tekton.dev/displayName: "Build and upload container image using Kaniko"
+spec:
+  description: >-
+    This Task builds container image using Google's kaniko tool and push to AWS ECR.
+
+  params:
+  - name: image_repo
+    description: "Image repository (Ex: 12345677788.dkr.ecr.us-east-1.amazonaws.com/myimage)"
+  - name: image_tag
+    description: Image tag    
+  - name: dockerfile
+    description: Dockerfile path for build.
+    default: ./Dockerfile
+  - name: context
+    description: Kaniko context for build.
+    default: ./
+  - name: extra_args
+    type: array
+    default: []
+  - name: version
+    description: Kaniko image version (default is v1.8.1)
+    default: v1.8.1
+  - name: verbosity
+    description: Kaniko log level (<panic|fatal|error|warn|info|debug|trace>) (default is info)
+    default: info
+  #- name: aws_secret
+  #  description: AWS secret with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+
+  results:
+    - name: IMAGE_DIGEST
+      description: Image digest.
+    - name: IMAGE_URL
+      description: Image Url.
+
+  workspaces:
+  - name: source
+    description: Context directory containing Dockerfile and other assets to build image
+
+
+  steps:
+  - name: kaniko-build
+    workingDir: $(workspaces.source.path)
+    image: gcr.io/kaniko-project/executor:$(params.version)
+    #envFrom:
+    #  - secretRef:
+    #      name: $(params.aws_secret)
+    args:
+    - --dockerfile=$(params.dockerfile)
+    - --context=$(workspaces.source.path)/$(params.context) 
+    - --destination=$(params.image_repo):$(params.image_tag)
+    - --oci-layout-path=$(workspaces.source.path)/$(params.context)/image-digest 
+    - --cache
+    - --cache-dir=/cache
+    - --verbosity=$(params.verbosity)
+    - --digest-file=$(results.IMAGE_DIGEST.path)
+    - $(params.extra_args[*])
+    securityContext:
+      runAsUser: 0
+    volumeMounts:
+      - name: kaniko-image-cache
+        mountPath: /cache
+      # Java Maven m2 cache  
+      #- name: m2-cache
+      #  mountPath: /root/.m2
+
+  - name: emmit-result-image-url
+    image: bash:latest
+    script: |
+      #!/usr/bin/env bash
+      echo -n "$(params.image_repo):$(params.image_tag)"|tee $(results.IMAGE_URL.path)      
+
+  volumes:
+  - name: kaniko-image-cache
+    persistentVolumeClaim:
+      claimName: kaniko-image-cache
+  # Java Maven m2 cache    
+  #- name: m2-cache
+  #  persistentVolumeClaim:
+  #    claimName: m2-cache      

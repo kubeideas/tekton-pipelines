@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kaniko-warmer
+  labels:
+      app: kaniko
+spec:
+  template:
+    spec:
+      containers:
+      - name: kaniko-warmer
+        image: gcr.io/kaniko-project/warmer:latest
+        args:
+        - --cache-dir=/workspace/cache
+        - --image=golang:1.15
+        - --image=gcr.io/distroless/static:nonroot
+        volumeMounts:
+        - mountPath: /workspace/cache
+          name: kaniko-image-cache        
+      restartPolicy: Never
+      volumes:
+        - name: kaniko-image-cache
+          persistentVolumeClaim:
+            claimName: kaniko-image-cache      
+  backoffLimit: 4 
