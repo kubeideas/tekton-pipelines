@@ -1,9 +1,9 @@
 # Helm task
 
-This document describes how to build and install Helm task.
+This document describes how install Helm task.
 
-## Build and install Helm task
+## Install task
 
 ```bash
-./build_install.sh <RESPOSITORY> <HELM-VERSION>
+kubectl apply -f helm.yaml
 ```
