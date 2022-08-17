@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: golang-code-coverage
   labels:
-    app.kubernetes.io/version: "0.1"
+    app.kubernetes.io/version: "0.2"
   annotations:
     tekton.dev/pipelines.minVersion: "0.27.1"
     tekton.dev/categories: Testing
@@ -14,7 +14,7 @@ spec:
     This task run golang code tests
   params:
     - name: version
-      description: golang image version (default is 1.15)
+      description: golang image version. (default = 1.15)
       default: "1.15"
     - name: GOOS
       description: operating system target
@@ -35,13 +35,13 @@ spec:
       workingDir: $(workspaces.golang-source.path)
       env:
       - name: CGO_ENABLED
-        value: "$(params.CGO_ENABLED)"      
+        value: "$(params.CGO_ENABLED)"
       - name: GOOS
         value: "$(params.GOOS)"
       - name: GOARCH
         value: "$(params.GOARCH)"
       - name: GO111MODULE
-        value: "$(params.GO111MODULE)"         
+        value: "$(params.GO111MODULE)" 
       script: |
         #!/bin/bash
         echo " "
