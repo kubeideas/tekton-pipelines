@@ -9,12 +9,13 @@ Create a Kubernetes secret with SMTP keys to send emails.
 ```bash
 kubectl create secret generic sendmail \
 --from-literal=SMTP_SERVER=<SERVER-NAME:PORT> \
---from-literal=SMTP_AUTH_USER=<SMTP-USERNAME> \
---from-literal=SMTP_AUTH_PASSOWRD=<SMTP-PASSWORD>
+--from-literal=SMTP_PORT=<PORT> \
+--from-literal=SMTP_USERNAME=<SMTP-USERNAME> \
+--from-literal=SMTP_PASSWORD=<SMTP-PASSWORD>
 ```
 
-## Build and install Sendmail task
+## Install Sendmail task
 
 ```bash
-./build_install.sh <RESPOSITORY> <SENDMAIL-VERSION>
+kubectl apply -f sendmail.yaml
 ```

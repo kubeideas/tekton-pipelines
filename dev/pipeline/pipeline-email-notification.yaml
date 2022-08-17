@@ -181,8 +181,6 @@ spec:
           value: $(params.namespace)
         - name: sendmail_secret
           value: sendmail
-        - name: send_method
-          value: "SMTP"
         - name: from
           value: "tekton@dev.test"
         - name: recipients
@@ -210,7 +208,7 @@ spec:
         - name: pusher_name
           value: $(params.pusher_name)
         - name: pusher_email
-          value: $(params.pusher_email)       
+          value: $(params.pusher_email)
         - name: pipelinerun_status
           value: $(tasks.status)
         - name: pipelinerun_name
@@ -219,8 +217,6 @@ spec:
           value: $(params.namespace)
         - name: sendmail_secret
           value: sendmail
-        - name: send_method
-          value: "SMTP"
         - name: from
           value: "tekton@dev.test"
         - name: recipients

@@ -11,8 +11,8 @@ kubectl create secret generic sendmail \
 --from-literal=HOOK_URL=XXXXXXXXXXXXXXXXXXXXXX
 ```
 
-## Build and install Slack task
+## Install Slack task
 
 ```bash
-./build_install.sh <RESPOSITORY> <SLACK-VERSION>
+kubectl apply -f slack.yaml
 ```

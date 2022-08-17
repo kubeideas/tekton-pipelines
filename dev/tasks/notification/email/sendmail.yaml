@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: sendmail
   labels:
-    app.kubernetes.io/version: "0.3"
+    app.kubernetes.io/version: "0.4"
   annotations:
     tekton.dev/pipelines.minVersion: "0.28.0"
     tekton.dev/categories: Notification Tools
@@ -15,60 +15,60 @@ spec:
   params:
     - name: git_repo
       description: Git repository full name.
+    - name: git_branch
+      description: Git branch.         
     - name: git_commit
       description: Git commit.
-    - name: git_branch
-      description: Git branch.   
     - name: pusher_name
       description: Git pusher's name.
     - name: pusher_email
-      description: Git pusher's email.                 
+      description: Git pusher's email.
+    - name: pipelinerun_name
+      description: PipelineRun name.      
     - name: pipelinerun_status
       description: PipelineRun status.
-    - name: pipelinerun_name
-      description: PipelineRun name.
     - name: namespace
       description: Application namespace.
+    - name: send_type
+      description: "Notifications send type"
+      default: "SMTP"
     - name: sendmail_secret
-      description: SMTP or API credentials.    
-    - name: send_method
-      description: "Method to send email. Valid values: (SMTP|API). Default: SMTP."
-      default: "SMTP"              
+      description: secret name with credentials.   
+    - name: subject
+      description: Email subject.
     - name: from
       description: Sender email addresses.
     - name: recipients
-      description: Recipient email address list separated by space or a group.
-    - name: subject
-      description: Email subject.         
-
+      description: Recipient email address or groups list separated by comma.
+       
   steps:
   - name: send-message
-    image: docker.io/kubeideas/sendmail:v0.3.0
+    image: docker.io/kubeideas/tekton-notifications:v0.1.0
     env:
       - name: "GIT_REPO"
         value: $(params.git_repo)
+      - name: "GIT_BRANCH"
+        value: $(params.git_branch)        
       - name: "GIT_COMMIT"
         value: $(params.git_commit)
-      - name: "GIT_BRANCH"
-        value: $(params.git_branch)
       - name: "PUSHER_NAME"
         value: $(params.pusher_name)
       - name: "PUSHER_EMAIL"
         value: $(params.pusher_email)
+      - name: "PIPELINERUN_NAME"
+        value: $(params.pipelinerun_name)        
       - name: "PIPELINERUN_STATUS"
         value: $(params.pipelinerun_status)
-      - name: "PIPELINERUN_NAME"
-        value: $(params.pipelinerun_name)
       - name: "NAMESPACE"
         value: $(params.namespace)
-      - name: "SEND_METHOD"
-        value: $(params.send_method)
-      - name: "FROM"
-        value: $(params.from)
-      - name: "RECIPIENTS"
-        value: $(params.recipients)
-      - name: "SUBJECT"
+      - name: "SEND_TYPE"
+        value: $(params.send_type)
+      - name: "SMTP_SUBJECT"
         value: $(params.subject)
+      - name: "SMTP_FROM"
+        value: $(params.from)
+      - name: "SMTP_RECIPIENTS"
+        value: $(params.recipients)
     envFrom:
       - secretRef:
           name: $(params.sendmail_secret)

@@ -33,7 +33,7 @@ spec:
       - name: git_url
         value: $(tt.params.git_url)
       - name: git_commit
-        value: $(tt.params.git_commit)        
+        value: $(tt.params.git_commit)
       - name: chart_repo_url
         value: https://antonio-tolentino.github.io/charts/
       - name: chart_name
