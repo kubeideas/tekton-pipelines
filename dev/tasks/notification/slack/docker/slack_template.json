@@ -1,8 +1,7 @@
 {
-    "channel": "<CHANNEL>",
     "attachments": [
         {
-	        "mrkdwn_in": ["text"],
+            "mrkdwn_in": ["text"],
             "color": "{COLOR}",
             "title": "Tekton Pipelines",
             "fields": [
@@ -50,7 +49,7 @@
                     "title": "When",
                     "value": "{CUR_DAT}",
                     "short": true
-                }                                                            
+                }
             ]
         }
     ]
